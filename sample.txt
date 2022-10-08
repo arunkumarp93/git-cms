@@ -1,0 +1,13 @@
+i) landing page
+    a) github repo configure (posts and drafts folders)
+    b) if repo is not configure
+     
+    
+ii) list of blogs
+    a) get all the blogs from the folder
+    b) post push and delete APIs
+    
+iii) list of drafts
+    a) list all the drafts from the given folder
+    b) drafts push and delete APIs to Draft folder
+    c) drafts push to blogs folder

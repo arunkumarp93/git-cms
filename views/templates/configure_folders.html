@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block content %}
+<!-- page -->
+<main
+        class="mx-auto flex min-h-screen w-full items-center justify-center dark:bg-gray-800 dark:text-gray-200"
+        xmlns="http://www.w3.org/1999/html">
+    <!-- component -->
+    <form action="{{ url_for('get_page.configure_folders') }}" method="post">
+        <section class="flex w-[30rem] flex-col space-y-10">
+            <div class="text-center text-2xl font-normal">Configure Folders</div>
+            <p class="font-normal leading-9 tracking-wider
+                                 text-gray-800 dark:text-white ">
+                NOTE: Folder names are case sensitive.
+            </p>
+
+            <div
+                    class="w-full transform border-b-2 bg-transparent text-lg duration-300 focus-within:border-indigo-500"
+            >
+                <input
+                        type="text"
+                        id="repo-folder"
+                        name="repo-name"
+                        placeholder="Enter Repo Name"
+                        class="w-full border-none bg-transparent outline-none placeholder:italic focus:outline-none"
+                />
+            </div>
+            <div
+                    class="w-full transform border-b-2 bg-transparent text-lg duration-300 focus-within:border-indigo-500"
+            >
+
+                <input
+                        type="text"
+                        id="blogs-folder"
+                        name="blogs-folder-name"
+                        placeholder="Enter Blogs Folder Name"
+                        class="w-full border-none bg-transparent outline-none placeholder:italic focus:outline-none"
+                />
+            </div>
+            <div
+                    class="w-full transform border-b-2 bg-transparent text-lg duration-300 focus-within:border-indigo-500"
+            >
+                <input
+                        type="text"
+                        id="draft-folder"
+                        name="draft-folder-name"
+                        placeholder="Drafts Folder Name"
+                        class="w-full border-none bg-transparent outline-none placeholder:italic focus:outline-none"
+                />
+            </div>
+
+            <button
+                    class="rounded-md flex space-x-2 w-full h-10 font-normal text-sm
+                                        leading-3 text-indigo-700 bg-white border border-indigo-700
+                                        focus:outline-none focus:bg-gray-200 hover:bg-gray-200 duration-150
+                                        justify-center items-center"
+            type="submit">
+                Save/Update Folder Names
+            </button>
+
+        </section>
+    </form>
+   <script>
+       let draft_folder = "{{session['drafts_folder_name']}}"
+       let post_folder = "{{session['blogs_folder_name']}}"
+       let repo_folder = "{{session['repo_name']}}"
+       const draft_folder_ele = document.getElementById('draft-folder')
+       const blog_folder_ele = document.getElementById('blogs-folder')
+       const repo_folder_ele = document.getElementById('repo-folder')
+
+       if (draft_folder){
+        draft_folder_ele.value = draft_folder
+       }
+       if (post_folder){
+        blog_folder_ele.value = post_folder
+       }
+       if (repo_folder){
+        repo_folder_ele.value = repo_folder
+       }
+
+   </script>
+</main>
+{% endblock %}

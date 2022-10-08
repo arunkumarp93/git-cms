@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <title>Github CMS</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+          theme: {
+            extend: {}
+          },
+          darkMode: "class"
+        }
+
+    </script>
+    <style>
+        /* Toggle CSS */
+        input:checked ~ .toggle-mode {
+          transform: translateX(100%);
+          background-color: #555;
+        }
+    </style>
+</head>
+<body class="dark:bg-gray-800 dark:text-gray-200">
+    <!--header-->
+    <div class=" bg-white dark:bg-gray-800">
+        <nav class="2xl:container 2xl:mx-auto sm:py-6 sm:px-7 py-5 px-4">
+                <!-- For large and Medium-sized Screen -->
+                <div class="flex justify-between ">
+                    <div class=" flex space-x-6 items-center">
+                        <h1 class=" font-normal font-medium text-2xl leading-6 text-gray-800 dark:text-white " >
+                           <a href="/"> Github Pages CMS </a>
+                        </h1>
+                    </div>
+                    <div class="hidden sm:flex flex-row space-x-2">
+
+                        <label for="toggle-dark-mode" class="flex items-center cursor-pointer">
+                            <span class="text-xs mr-2 font-extralight">Light </span>
+                            <!-- toggle -->
+                            <div class="relative">
+                                <!-- input -->
+                                <input id="toggle-dark-mode" type="checkbox" class="sr-only"/>
+                                <!-- line -->
+                                <div class="w-10 h-4 bg-gray-400 rounded-full shadow-inner"></div>
+                                <!-- toggle-mode -->
+                                <div class="toggle-mode absolute w-6 h-6 bg-white rounded-full shadow -left-1 -top-1 transition"></div>
+                            </div>
+                            <span class="text-xs ml-2 font-semibold">Dark</span>
+                        </label>
+
+                    </div>
+                    <div class="hidden sm:flex flex-row space-x-4">
+                        {% if current_user.is_authenticated %}
+                            <h5 class="font-normal leading-9 tracking-wider
+                             text-gray-800 dark:text-white ">
+                                Welcome {{current_user.username}}
+                            </h5>
+                            <a href={{url_for('get_page.configure_folders')}}>
+                                <button class="rounded-md flex space-x-2 w-36 h-10 font-normal text-sm
+                                    leading-3 text-indigo-700 bg-white border border-indigo-700
+                                    focus:outline-none focus:bg-gray-200 hover:bg-gray-200 duration-150
+                                    justify-center items-center" >Configure Folders
+                                </button>
+                            </a>
+                            <a href={{url_for('get_page.get_all_pages')}}>
+                                <button class="rounded-md flex space-x-2 w-36 h-10 font-normal text-sm
+                                    leading-3 text-indigo-700 bg-white border border-indigo-700
+                                    focus:outline-none focus:bg-gray-200 hover:bg-gray-200 duration-150
+                                    justify-center items-center" >Posts List
+                                </button>
+                            </a>
+                            <a href={{url_for('post_or_update.post_a_page')}}>
+                                    <button class="rounded-md flex space-x-2 w-24 h-10 font-normal text-sm
+                                        leading-3 text-indigo-700 bg-white border border-indigo-700
+                                        focus:outline-none focus:bg-gray-200 hover:bg-gray-200 duration-150
+                                        justify-center items-center" >Create Post
+                                    </button>
+                            </a>
+                            <a href={{url_for('post_or_update.list_drafts')}}>
+                                    <button class="rounded-md flex space-x-2 w-24 h-10 font-normal text-sm
+                                        leading-3 text-indigo-700 bg-white border border-indigo-700
+                                        focus:outline-none focus:bg-gray-200 hover:bg-gray-200 duration-150
+                                        justify-center items-center" >Drafts
+                                    </button>
+                            </a>
+                            <a href={{url_for('authenticate_page.logout')}}>
+                                <button class="rounded-md flex space-x-2 w-24 h-10 font-normal text-sm
+                                    leading-3 text-indigo-700 bg-white border border-indigo-700
+                                    focus:outline-none focus:bg-gray-200 hover:bg-gray-200 duration-150
+                                    justify-center items-center" >Log Out
+                                </button>
+                            </a>
+                        {% else %}
+                            <a href="{{url_for('authenticate_page.login')}}">
+                                <button class="rounded-md flex space-x-2 w-24 h-10 font-normal
+                                     text-sm leading-3 text-white bg-indigo-700 focus:outline-none
+                                     focus:ring-2 focus:ring-offset-2 focus:ring-indigo-700
+                                     focus:bg-indigo-600 hover:bg-indigo-600 duration-150
+                                     justify-center items-center" >Log In
+                                </button>
+                            </a>
+                        {% endif %}
+                    </div>
+
+                    <!-- Burger Icon -->
+                    <div id="bgIcon" onclick="toggleMenu()"  class="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800  flex justify-center items-center sm:hidden cursor-pointer">
+                        <img class="dark:bg-white" src="https://tuk-cdn.s3.amazonaws.com/can-uploader/header-3-svg6.svg" alt="burger" />
+                       <img class="dark:bg-white hidden" src="https://tuk-cdn.s3.amazonaws.com/can-uploader/header-3-svg7.svg" alt="cross" />
+                    </div>
+                </div>
+
+                <!-- Mobile and small-screen devices (toggle Menu) -->
+                <div id="mobile-navigation" class="hidden sm:hidden mt-4 mx-auto">
+                    <div class="flex flex-col gap-4 mt-4 w-80 mx-auto ">
+                        {% if current_user.is_authenticated %}
+                          <h5 class="font-normal leading-9 tracking-wider
+                             text-gray-800 dark:text-white ">
+                                Welcome {{current_user.username}}
+                            </h5>
+                               <a href={{url_for('get_page.configure_folders')}}>
+                                <button class="rounded-md flex space-x-2 w-full h-10 font-normal text-sm
+                                    leading-3 text-indigo-700 bg-white border border-indigo-700
+                                    focus:outline-none focus:bg-gray-200 hover:bg-gray-200 duration-150
+                                    justify-center items-center" >Configure Folders
+                                </button>
+                            </a>
+                            <a href={{url_for('get_page.get_all_pages')}}>
+                                <button class="rounded-md flex space-x-2 w-36 h-10 font-normal text-sm
+                                    leading-3 text-indigo-700 bg-white border border-indigo-700
+                                    focus:outline-none focus:bg-gray-200 hover:bg-gray-200 duration-150
+                                    justify-center items-center" >Posts List
+                                </button>
+                            </a>
+                            <a href={{url_for('post_or_update.post_a_page')}}>
+                                    <button class="rounded-md flex space-x-2 w-full h-10 font-normal text-sm
+                                        leading-3 text-indigo-700 bg-white border border-indigo-700
+                                        focus:outline-none focus:bg-gray-200 hover:bg-gray-200 duration-150
+                                        justify-center items-center" >Create Post
+                                    </button>
+                            </a>
+                            <a href={{url_for('post_or_update.list_drafts')}}>
+                                    <button class="rounded-md flex space-x-2 w-full h-10 font-normal text-sm
+                                        leading-3 text-indigo-700 bg-white border border-indigo-700
+                                        focus:outline-none focus:bg-gray-200 hover:bg-gray-200 duration-150
+                                        justify-center items-center" >Drafts
+                                    </button>
+                            </a>
+                            <a href={{url_for('authenticate_page.logout')}}>
+                                <button class="rounded-md flex space-x-2 w-full h-10 font-normal text-sm
+                                    leading-3 text-indigo-700 bg-indigo-600 bg-opacity-0 hover:opacity-100
+                                    duration-100 border border-indigo-700 focus:outline-none
+                                    focus:bg-gray-200 hover:bg-gray-200 duration-150 justify-center
+                                    items-center" >Log Out
+                                </button>
+                            </a>
+                        {%else%}
+                            <a href={{url_for('authenticate_page.login')}}>
+                                <button class="rounded-md flex space-x-2 w-full h-10 font-normal text-sm
+                                     leading-3 text-white bg-indigo-700 focus:outline-none focus:ring-2
+                                     focus:ring-offset-2 focus:ring-indigo-700 focus:bg-indigo-600
+                                     hover:bg-indigo-600 duration-150 justify-center items-center" >Log In
+                                </button>
+                            </a>
+                        {%endif%}
+                    </div>
+                </div>
+            </nav>
+    </div>
+    <!--header-->
+
+    {% block content %}
+    {% endblock %}
+    <script>
+                // toggle dark mode start
+                  const toggle_checkbox = document.querySelector("#toggle-dark-mode");
+                  const html = document.querySelector("html");
+
+                  const toggleDarkMode = function () {
+                    toggle_checkbox.checked
+                    ? html.classList.add("dark")
+                    : html.classList.remove("dark");
+                  }
+
+                    //calling the function directly
+
+                  toggleDarkMode();
+                  toggle_checkbox.addEventListener("click",toggleDarkMode);
+                // toggle dark mode start
+
+                //toggle menu start
+                  const toggleMenu = function(){
+                     const mobile_menu=document.getElementById("mobile-navigation")
+                     mobile_menu.classList.toggle('hidden')
+                  }
+                //toggle menu end
+    </script>
+</body>
+</html>
