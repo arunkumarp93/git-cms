@@ -39,7 +39,7 @@ def tags_formatter(tags):
     return result
 
 
-def generate_markdown(blog_content):
+def generate_markdown(blog_content, get_sep_values=False):
     title = blog_content.get("title")
     last_modified = datetime.datetime.utcnow().isoformat(
         sep="T", timespec="milliseconds"
@@ -52,5 +52,7 @@ def generate_markdown(blog_content):
         f"---\ntitle: {title}\nlast_modified_at: {last_modified}\n"
         f"categories:\n  {categories}tags:\n  {tags}---\n\n{content}"
     )
-
-    return markdown
+    if get_sep_values:
+        return title, categories, tags, content, markdown
+    else:
+        return markdown

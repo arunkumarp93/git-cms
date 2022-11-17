@@ -6,7 +6,7 @@ from views.utils.github import (
     get_github_auth_token,
     get_generate_github_object,
     get_current_user_name_from_github,
-    get_folder_and_repo,
+    get_folders_and_repo,
 )
 
 get_page = Blueprint("get_page", __name__)
@@ -39,7 +39,7 @@ def get_all_pages() -> str:
 
             context["is_valid_token"] = True
 
-            repo_name, blogs_folder_name = get_folder_and_repo()
+            repo_name, blogs_folder_name, drafts_folder_name = get_folders_and_repo()
 
             if current_username and repo_name and blogs_folder_name:
                 repo = github.get_repo(f"{current_username}/{repo_name}")

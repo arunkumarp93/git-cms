@@ -2,12 +2,12 @@ import base64
 from flask import Blueprint, render_template, request
 from flask_login import login_required
 
-from views.utils.blog import deconstruct_post  # , generate_markdown
+from views.utils.blog import deconstruct_post, generate_markdown
 from views.utils.github import (
     get_generate_github_object,
-    get_current_user_name_from_github,
     get_github_auth_token,
-    get_folder_and_repo,
+    update_or_create_file_in_posts_github,
+    get_configure_repo_object,
 )
 
 create_or_update = Blueprint("post_or_update", __name__, template_folder="templates")
@@ -33,10 +33,10 @@ def update_or_view_page(file_name):
             try:
                 github_token = get_github_auth_token()
                 github = get_generate_github_object(github_token)
-                current_username = get_current_user_name_from_github(github)
-                repo_name, blogs_folder_name = get_folder_and_repo()
-                repo = github.get_repo(f"{current_username}/{repo_name}")
 
+                repo, blogs_folder_name = get_configure_repo_object(
+                    github, blogs_folder=True
+                )
                 blog_content = repo.get_contents(f"{blogs_folder_name}/{file_name}")
                 context["file_exist"] = True
                 context["content"] = deconstruct_post(
@@ -48,8 +48,18 @@ def update_or_view_page(file_name):
 
         return render_template("edit_post.html", context=context)
     elif request.method == "POST":
-        # github_content = generate_markdown(request.form)
-        return render_template("edit_post.html", context=context)
+        title, categories, tags, content, github_content = generate_markdown(
+            request.form, get_sep_values=True
+        )
+        try:
+            update_or_create_file_in_posts_github(github_content, file_name)
+            context["title"] = title
+            context["categories"] = categories
+            context["tage"] = tags
+            context["content"] = content
+        except Exception as e:
+            context["error"] = f"Unable to update the blog page {str(e.args)}"
+        return render_template("edit_post.html")
 
 
 @create_or_update.route("/drafts", methods=["GET", "POST"])

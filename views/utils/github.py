@@ -38,12 +38,59 @@ def get_current_user_name_from_github(github: Github):
     return logged_in_user.login
 
 
-def get_folder_and_repo():
+def get_folders_and_repo():
     """
     Get the repo and blogs folder data from the session
     :return: (tuple)
     """
     repo_name = session.get("repo_name")
     blogs_folder_name = session.get("blogs_folder_name")
+    drafts_folder_name = session.get("drafts_folder_name")
 
-    return repo_name, blogs_folder_name
+    return repo_name, blogs_folder_name, drafts_folder_name
+
+
+def get_configure_repo_object(github_object, blogs_folder=False):
+    """
+    Get the current repo object from github
+    :param github_object:
+    :param blogs_folder: (bool)
+    :return:
+    """
+    repo_name, blogs_folder_name, drafts_folder_name = get_folders_and_repo()
+    current_username = get_current_user_name_from_github(github_object)
+    repo_obj = github_object.get_repo(f"{current_username}/{repo_name}")
+    if not blogs_folder:
+        return repo_obj
+    return repo_obj, blogs_folder_name
+
+
+def update_or_create_file_in_posts_github(content, filename, branch="master"):
+    """
+    i)   get the last commit hash
+    ii)  create the blog content
+    iii) create a tree defines the folder structure
+    iv)  create the commit with the last commit
+    v)   update the HEAD pointer to the current commit
+    :return:
+
+    REF:
+    https://www.folkstalk.com/tech/how-to-upload-files-and-folders-with-pygithub-with-code-examples/
+
+    """
+    github_auth_token = get_github_auth_token()
+    github_object = get_generate_github_object(github_auth_token)
+    repo = get_configure_repo_object(github_object)
+
+    _, posts, _ = get_folders_and_repo()
+    file_path = f"{posts}/{filename}"
+    posts_contents = repo.get_contents(posts)
+    posts_files_name = {post.path: post.path for post in posts_contents}
+
+    if file_path in posts_files_name:
+        file_content = repo.get_contents(file_path)
+        repo.update_file(
+            file_path, f"update {filename}", content, file_content.sha, branch=branch
+        )
+    else:
+        repo.create_file(file_path, f"create {filename}", content, branch=branch)
