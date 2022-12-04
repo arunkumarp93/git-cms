@@ -65,7 +65,36 @@ def get_configure_repo_object(github_object, blogs_folder=False):
     return repo_obj, blogs_folder_name
 
 
-def update_or_create_file_in_posts_github(content, filename, branch="master"):
+def delete_file_from_github(filename, branch="master", folder="posts"):
+    github_auth_token = get_github_auth_token()
+    github_object = get_generate_github_object(github_auth_token)
+    repo = get_configure_repo_object(github_object)
+
+    _, posts, drafts = get_folders_and_repo()
+
+    if folder == "posts":
+        file_path = f"{posts}/{filename}"
+    elif folder == "drafts":
+        file_path = f"{drafts}/{filename}"
+    else:
+        file_path = ""
+
+    posts_contents = repo.get_contents(posts)
+    posts_files_name = {post.path: post.path for post in posts_contents}
+
+    if file_path in posts_files_name:
+        file_content = repo.get_contents(file_path)
+        repo.delete_file(
+            file_path, f"Delete {filename}", file_content.sha, branch=branch
+        )
+        return True
+    else:
+        return False
+
+
+def update_or_create_file_in_posts_github(
+    content, filename, branch="master", folder="posts"
+):
     """
     i)   get the last commit hash
     ii)  create the blog content
@@ -82,8 +111,13 @@ def update_or_create_file_in_posts_github(content, filename, branch="master"):
     github_object = get_generate_github_object(github_auth_token)
     repo = get_configure_repo_object(github_object)
 
-    _, posts, _ = get_folders_and_repo()
-    file_path = f"{posts}/{filename}"
+    _, posts, drafts = get_folders_and_repo()
+    if folder == "posts":
+        file_path = f"{posts}/{filename}"
+    elif folder == "drafts":
+        file_path = f"{drafts}/{filename}"
+    else:
+        file_path = ""
     posts_contents = repo.get_contents(posts)
     posts_files_name = {post.path: post.path for post in posts_contents}
 

@@ -45,6 +45,13 @@
                       >
                         View/Edit</a>
                     </p>
+                      <p class="text-sm">
+                      <a id="{{loop.index}}-deleteBtn"
+                         href=""
+                        onclick="return deletePost(this.id)"
+                      >
+                        Delete</a>
+                    </p>
                   </div>
                 </li>
                 {% endfor %}
@@ -60,14 +67,22 @@
         <h2>Folder is not configure</h2>
       {% endif %}
         <script>
-            function viewPost(id){
-                let page_id = id+"-page"
+            function getPageName(id_text){
+                let page_id = id+"-"+id_text
                 let page_element = document.getElementById(page_id)
                 const page_file_name = page_element.innerText
+            };
+            function viewPost(id){
+                const page_file_name = getPageName('page')
                 const view_url = '/update/' + page_file_name
-
                 let clicked_link = document.getElementById(id)
                 clicked_link.href = view_url
+            };
+
+            function deletePost(id){
+                const page_file_name = getPageName('page')
+                const view_url = '/delete/' + page_file_name
+
             }
         </script>
   {% endif %}

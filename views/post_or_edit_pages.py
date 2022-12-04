@@ -1,4 +1,5 @@
 import base64
+
 from flask import Blueprint, render_template, request
 from flask_login import login_required
 
@@ -8,6 +9,7 @@ from views.utils.github import (
     get_github_auth_token,
     update_or_create_file_in_posts_github,
     get_configure_repo_object,
+    delete_file_from_github,
 )
 
 create_or_update = Blueprint("post_or_update", __name__, template_folder="templates")
@@ -59,10 +61,17 @@ def update_or_view_page(file_name):
             context["content"] = content
         except Exception as e:
             context["error"] = f"Unable to update the blog page {str(e.args)}"
-        return render_template("edit_post.html")
+        return context
 
 
 @create_or_update.route("/drafts", methods=["GET", "POST"])
 @login_required
 def list_drafts():
     return render_template("drafts.html")
+
+
+@create_or_update.route("/delete/<string:file_name>", methods=["delete"])
+@login_required
+def delete_file(file_name):
+    breakpoint()
+    return delete_file_from_github(file_name)
