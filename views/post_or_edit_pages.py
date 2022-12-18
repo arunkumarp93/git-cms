@@ -1,4 +1,5 @@
 import base64
+from datetime import datetime
 
 from flask import Blueprint, render_template, request
 from flask_login import login_required
@@ -18,7 +19,22 @@ create_or_update = Blueprint("post_or_update", __name__, template_folder="templa
 @create_or_update.route("/create", methods=["GET", "POST"])
 @login_required
 def post_a_page():
-    return render_template("create_post.html")
+    if request.method == "GET":
+        return render_template("create_post.html")
+    elif request.method == "POST":
+        context = {}
+        title, categories, tags, content, github_content = generate_markdown(
+            request.form, get_sep_values=True
+        )
+        try:
+            today_date = datetime.today().strftime("%Y-%m-%d")
+            file_name = f"{today_date}-{request.form.get('filename')}.md"
+            update_or_create_file_in_posts_github(github_content, file_name)
+            context["message"] = "Created successfully"
+        except Exception as e:
+            context["error"] = f"Unable to update the blog page {str(e.args)}"
+
+        return render_template("create_post.html", context=context)
 
 
 @create_or_update.route("/update/<string:file_name>", methods=["GET", "POST"])
@@ -73,5 +89,4 @@ def list_drafts():
 @create_or_update.route("/delete/<string:file_name>", methods=["delete"])
 @login_required
 def delete_file(file_name):
-    breakpoint()
     return delete_file_from_github(file_name)

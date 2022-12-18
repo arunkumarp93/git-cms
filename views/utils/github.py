@@ -84,12 +84,15 @@ def delete_file_from_github(filename, branch="master", folder="posts"):
 
     if file_path in posts_files_name:
         file_content = repo.get_contents(file_path)
-        repo.delete_file(
-            file_path, f"Delete {filename}", file_content.sha, branch=branch
-        )
-        return True
+        try:
+            repo.delete_file(
+                file_path, f"Delete {filename}", file_content.sha, branch=branch
+            )
+            return True
+        except Exception as e:
+            return {"error": f"unable to delete the file {str(e.args)}"}
     else:
-        return False
+        return {"error": "File does not exists"}
 
 
 def update_or_create_file_in_posts_github(

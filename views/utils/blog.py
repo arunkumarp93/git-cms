@@ -41,7 +41,7 @@ def deconstruct_post(content):
 def tags_formatter(tags):
     result = ""
     for _, tag in enumerate(tags):
-        result += f"- {tag}\n  "
+        result += f"  - {tag}\n"
     # empty spaces used on markdown file to handle
     # the headers
     if not result:

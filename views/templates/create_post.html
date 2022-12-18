@@ -9,6 +9,12 @@
 </head>
 <form id="post-update" onsubmit="event.preventDefault(); postSubmit()">
     <div class="mb-6">
+        <label for="filename" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">File Name</label>
+        <input type="text" id="filename"
+               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+               placeholder="Enter the filename" required="", value="">
+    </div>
+    <div class="mb-6">
         <label for="title" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">Post Title</label>
         <input type="text" id="title"
                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -36,10 +42,40 @@
 
 <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 <script>
-        const editor = new toastui.Editor({
+let filename_ele = document.getElementById("filename")
+let title_ele = document.getElementById("title")
+let date_ele = document.getElementById('date')
+let category_ele = document.getElementById("categories")
+let tags_ele = document.getElementById("tags")
+let post_create_url = '{{url_for("post_or_update.post_a_page")}}'
+const editor = new toastui.Editor({
         el: document.querySelector('#editor'),
         previewStyle: 'vertical',
         height: '500px'
       });
+
+
+function postSubmit(){
+                let data = new FormData()
+                data.append("filename", filename_ele.value)
+                data.append("title", title_ele.value)
+                data.append("tags", tags_ele.value)
+                data.append("categories", category_ele.value)
+                data.append("content", editor.getMarkdown())
+                fetch("http://localhost:5000"+post_create_url, {
+                    "method":"POST",
+                    "body":data
+                }).then(response=>response.json())
+                .then(data=>{
+                    if(data['error']){
+                        alert(data['error'])
+                    }else{
+                        alert("created successfully")
+                        location.reload(true)
+                    }
+
+                })
+
+}
 </script>
 {%endblock%}
