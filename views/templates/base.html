@@ -173,20 +173,45 @@
     {% endblock %}
     <script>
                 // toggle dark mode start
-                  const toggle_checkbox = document.querySelector("#toggle-dark-mode");
-                  const html = document.querySelector("html");
+                   const toggle_checkbox = document.querySelector("#toggle-dark-mode");
+                   const html = document.querySelector("html");
+                   const find_text_editor = document.getElementsByClassName('ProseMirror')[0]
+
+                   dark_mode_on = JSON.parse(localStorage.getItem('dark_mode'))
+                   if (dark_mode_on){
+                    toggle_checkbox.checked=true
+                    html.classList.add("dark")
+                    if (find_text_editor){
+                        find_text_editor.style.color="#fff"
+                        document.querySelectorAll('.toastui-editor-contents p').forEach(el => el.style.color="#fff")
+                    }
+                   }else{
+                   html.classList.remove("dark");
+                     if (find_text_editor){
+                        find_text_editor.style.color="#222"
+                        document.querySelectorAll('.toastui-editor-contents p').forEach(el => el.style.color="#222")
+                    }
+                   }
 
                   const toggleDarkMode = function () {
-                    toggle_checkbox.checked
-                    ? html.classList.add("dark")
-                    : html.classList.remove("dark");
+                    if(toggle_checkbox.checked){
+                        html.classList.add("dark")
+                        localStorage.setItem('dark_mode', true)
+                        if (find_text_editor){
+                            find_text_editor.style.color="#fff"
+                            document.querySelectorAll('.toastui-editor-contents p').forEach(el => el.style.color="#fff")
+                        }
+                    }else{
+                        html.classList.remove("dark");
+                        localStorage.setItem('dark_mode', false)
+                         if (find_text_editor){
+                            find_text_editor.style.color="#222"
+                            document.querySelectorAll('.toastui-editor-contents p').forEach(el => el.style.color="#222")
+                        }
+                    }
                   }
-
-                    //calling the function directly
-
-                  toggleDarkMode();
                   toggle_checkbox.addEventListener("click",toggleDarkMode);
-                // toggle dark mode start
+                // toggle dark mode end
 
                 //toggle menu start
                   const toggleMenu = function(){
