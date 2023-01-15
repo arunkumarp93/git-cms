@@ -55,6 +55,43 @@ def get_all_pages() -> str:
     return render_template("index.html", context=context)
 
 
+@get_page.route("/drafts", methods=["GET", "POST"])
+@login_required
+def get_all_drafts():
+    context = {
+        "session": current_user,
+        "posts": [],
+        "is_valid_token": False,
+        "repo_exist": False,
+        "folder_exist": False,
+        "message": "",
+        "exception": None,
+    }
+    github_token = get_github_auth_token()
+    if github_token:
+        # fetch the posts from the repo
+        try:
+            github = get_generate_github_object(github_token)
+            current_username = get_current_user_name_from_github(github)
+
+            context["is_valid_token"] = True
+
+            repo_name, blogs_folder_name, drafts_folder_name = get_folders_and_repo()
+
+            if current_username and repo_name and blogs_folder_name:
+                repo = github.get_repo(f"{current_username}/{repo_name}")
+                draft_folder_content = repo.get_contents(drafts_folder_name)
+                posts = [content.name for content in draft_folder_content]
+                context["repo_exist"] = True
+                context["folder_exist"] = True
+                context["posts"] = posts
+        except Exception as e:
+            context["exception"] = str(e.args)
+            return render_template("drafts.html", context=context)
+
+    return render_template("drafts.html", context=context)
+
+
 @get_page.route("/configure", methods=["GET", "POST"])
 @login_required
 def configure_folders():

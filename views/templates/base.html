@@ -77,7 +77,7 @@
                                         justify-center items-center" >Create Post
                                     </button>
                             </a>
-                            <a href={{url_for('post_or_update.list_drafts')}}>
+                            <a href={{url_for('get_page.get_all_drafts')}}>
                                     <button class="rounded-md flex space-x-2 w-24 h-10 font-normal text-sm
                                         leading-3 text-indigo-700 bg-white border border-indigo-700
                                         focus:outline-none focus:bg-gray-200 hover:bg-gray-200 duration-150
@@ -139,7 +139,7 @@
                                         justify-center items-center" >Create Post
                                     </button>
                             </a>
-                            <a href={{url_for('post_or_update.list_drafts')}}>
+                            <a href={{url_for('get_page.get_all_drafts')}}>
                                     <button class="rounded-md flex space-x-2 w-full h-10 font-normal text-sm
                                         leading-3 text-indigo-700 bg-white border border-indigo-700
                                         focus:outline-none focus:bg-gray-200 hover:bg-gray-200 duration-150
@@ -179,14 +179,14 @@
 
                    dark_mode_on = JSON.parse(localStorage.getItem('dark_mode'))
                    if (dark_mode_on){
-                    toggle_checkbox.checked=true
-                    html.classList.add("dark")
+                       toggle_checkbox.checked=true
+                       html.classList.add("dark")
                     if (find_text_editor){
                         find_text_editor.style.color="#fff"
                         document.querySelectorAll('.toastui-editor-contents p').forEach(el => el.style.color="#fff")
                     }
                    }else{
-                   html.classList.remove("dark");
+                     html.classList.remove("dark");
                      if (find_text_editor){
                         find_text_editor.style.color="#222"
                         document.querySelectorAll('.toastui-editor-contents p').forEach(el => el.style.color="#222")

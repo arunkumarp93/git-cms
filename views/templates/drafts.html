@@ -1,4 +1,103 @@
 {% extends "base.html" %}
 {% block content %}
-<h1>List all drafts</h1>
+
+{% if context['exception']%}
+<h2> unable to access the github error occurred: {{context['exception']}}</h2>
+{%else%}
+
+{% if not context['is_valid_token']%}
+<h2>Invalid token. Please login
+    <a class="underline hover:underline bg-gray-400"
+       href={{url_for('authenticate_page.login')}}>Login</a>
+</h2>
+{% endif %}
+
+{% if context['is_valid_token'] and context['repo_exist'] and context['folder_exist'] %}
+
+<div class="mt-12">
+    <div class="flow-root">
+        <ul class="-my-4 divide-y-2 divide-gray-400">
+            {% for post in context['posts'] %}
+            <li class="flex items-center justify-between py-4">
+                <div class="flex items-start">
+                    <div class="ml-4">
+                        <p class="text-sm" id="{{loop.index}}-page"> {{post}}</p>
+
+                        <!--                      <dl class="mt-1 space-y-1 text-xs text-gray-500">-->
+                        <!--                        <div>-->
+                        <!--                          <dt class="inline">Color:</dt>-->
+                        <!--                          <dd class="inline">Blue</dd>-->
+                        <!--                        </div>-->
+
+                        <!--                        <div>-->
+                        <!--                          <dt class="inline">Size:</dt>-->
+                        <!--                          <dd class="inline">UK 10</dd>-->
+                        <!--                        </div>-->
+                        <!--                      </dl>-->
+                    </div>
+                </div>
+
+                <div>
+                    <p class="text-sm">
+                        <a id="{{loop.index}}"
+                           href=""
+                           onclick="return viewPost(this.id)"
+                        >
+                            View/Edit</a>
+                    </p>
+                    <p class="text-sm">
+                        <a id="{{loop.index}}-deleteBtn"
+                           href=""
+                           onclick="return deletePost(this.id)"
+                        >
+                            Delete</a>
+                    </p>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% elif context['is_valid_token']  and not context['repo_exist'] %}
+<h2>Repo is not configure
+    <a class="underline hover:underline bg-gray-400"
+       href={{url_for('get_page.configure_folders')}}>Configure Repo</a>
+</h2>
+{% elif context['is_valid_token']  and not context['folder_exist'] %}
+<h2>Folder is not configure</h2>
+{% endif %}
+<script>
+            function getPageName(id){
+                let page_id = id+"-page"
+                let page_element = document.getElementById(page_id)
+                return page_element.innerText
+            };
+            function viewPost(id){
+                const page_file_name = getPageName(id)
+                const view_url = '/update/drafts/' + page_file_name
+                let clicked_link = document.getElementById(id)
+                clicked_link.href = view_url
+            };
+
+            function deletePost(id){
+                const page_file_name = getPageName(id.split('-')[0])
+                const delete_url = '/delete_draft/' + page_file_name
+
+                fetch("http://localhost:5000"+delete_url, {
+                    "method":"DELETE",
+                }).then(response=>response.json())
+                .then(data=>{
+                    if(data['error']){
+                        alert(data['error'])
+                    }else{
+                        alert("deleted successfully")
+                        location.reload(true)
+                    }
+
+                })
+
+            }
+
+</script>
+{% endif %}
 {% endblock %}

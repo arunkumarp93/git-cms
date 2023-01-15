@@ -7,12 +7,12 @@
     <!-- Editor's Style -->
     <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css"/>
 </head>
-<form id="post-update" onsubmit="event.preventDefault(); postSubmit()">
+<form id="post-update" onsubmit="event.preventDefault();">
     <div class="mb-6">
         <label for="filename" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">File Name</label>
         <input type="text" id="filename"
                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-               placeholder="Enter the filename" required="", value="">
+               placeholder="Enter the filename" required="" , value="">
     </div>
     <div class="mb-6">
         <label for="title" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">Post Title</label>
@@ -34,9 +34,13 @@
                   required=""></textarea>
     </div>
     <div id="editor"></div>
-    <button type="submit" id="post-update-submit"
+    <button type="submit" id="post-update-submit" onclick="postSubmit()"
             class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-        Submit
+        Create Post
+    </button>
+    <button type="submit" id="draft-update-submit" onclick="postDraft()"
+            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+        Create Draft
     </button>
 </form>
 
@@ -48,6 +52,7 @@ let date_ele = document.getElementById('date')
 let category_ele = document.getElementById("categories")
 let tags_ele = document.getElementById("tags")
 let post_create_url = '{{url_for("post_or_update.post_a_page")}}'
+let draft_create_url = '{{url_for("post_or_update.post_a_draft")}}'
 const editor = new toastui.Editor({
         el: document.querySelector('#editor'),
         previewStyle: 'vertical',
@@ -77,5 +82,29 @@ function postSubmit(){
                 })
 
 }
+
+function postDraft(){
+                let data = new FormData()
+                data.append("filename", filename_ele.value)
+                data.append("title", title_ele.value)
+                data.append("tags", tags_ele.value)
+                data.append("categories", category_ele.value)
+                data.append("content", editor.getMarkdown())
+                fetch("http://localhost:5000"+draft_create_url, {
+                    "method":"POST",
+                    "body":data
+                }).then(response=>response.json())
+                .then(data=>{
+                    if(data['error']){
+                        alert(data['error'])
+                    }else{
+                        alert("created successfully")
+                        location.reload(true)
+                    }
+
+                })
+
+}
+
 </script>
 {%endblock%}

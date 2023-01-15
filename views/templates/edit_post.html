@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css"/>
 </head>
 
-<form id="post-update" onsubmit="event.preventDefault(); postSubmit()">
+<form id="post-update" onsubmit="event.preventDefault();">
     <div class="mb-6">
         <label for="title" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">Post Title</label>
         <input type="text" id="title"
@@ -38,9 +38,14 @@
                   required=""></textarea>
     </div>
     <div id="editor"></div>
-    <button type="submit" id="post-update-submit"
+
+    <button type="submit" id="post-update-submit" onclick="postSubmit()"
             class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-        Submit
+        Update Post
+    </button>
+    <button type="submit" id="draft-update-submit" onclick="postDraft()"
+            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+        Update Draft
     </button>
 </form>
 
@@ -55,7 +60,9 @@ let tags_ele = document.getElementById("tags")
 let post_form = document.getElementById("post-update")
 let post_form_submit = document.getElementById("post-update-submit")
 let post_update_url = {{url_for("post_or_update.update_or_view_page", file_name="")}}
+let draft_update_url = '{{url_for("post_or_update.update_or_view_draft", file_name="")}}  '
 post_update_url += file_name
+draft_update_url += file_name
 
 if (content){
 title_ele.value=content['title']
@@ -87,6 +94,28 @@ function postSubmit(){
                     }else{
                         alert("Updated successfully")
                         location.reload()
+                    }
+
+                })
+
+}
+
+function postDraft(){
+                let data = new FormData()
+                data.append("title", title_ele.value)
+                data.append("tags", tags_ele.value)
+                data.append("categories", category_ele.value)
+                data.append("content", editor.getMarkdown())
+                fetch("http://localhost:5000"+draft_update_url, {
+                    "method":"POST",
+                    "body":data
+                }).then(response=>response.json())
+                .then(data=>{
+                    if(data['error']){
+                        alert(data['error'])
+                    }else{
+                        alert("created successfully")
+                        location.reload(true)
                     }
 
                 })

@@ -43,9 +43,9 @@ def get_folders_and_repo():
     Get the repo and blogs folder data from the session
     :return: (tuple)
     """
-    repo_name = session.get("repo_name")
-    blogs_folder_name = session.get("blogs_folder_name")
-    drafts_folder_name = session.get("drafts_folder_name")
+    repo_name = session.get("repo_name").strip()
+    blogs_folder_name = session.get("blogs_folder_name").strip()
+    drafts_folder_name = session.get("drafts_folder_name").strip()
 
     return repo_name, blogs_folder_name, drafts_folder_name
 
@@ -71,15 +71,15 @@ def delete_file_from_github(filename, branch="master", folder="posts"):
     repo = get_configure_repo_object(github_object)
 
     _, posts, drafts = get_folders_and_repo()
-
+    posts_contents = repo.get_contents(posts)
     if folder == "posts":
         file_path = f"{posts}/{filename}"
     elif folder == "drafts":
         file_path = f"{drafts}/{filename}"
+        posts_contents = repo.get_contents(drafts)
     else:
         file_path = ""
 
-    posts_contents = repo.get_contents(posts)
     posts_files_name = {post.path: post.path for post in posts_contents}
 
     if file_path in posts_files_name:
@@ -93,6 +93,13 @@ def delete_file_from_github(filename, branch="master", folder="posts"):
             return {"error": f"unable to delete the file {str(e.args)}"}
     else:
         return {"error": "File does not exists"}
+
+
+def get_repo_contents(repo, folder_name):
+    try:
+        return repo.get_contents(folder_name)
+    except Exception:
+        return ""
 
 
 def update_or_create_file_in_posts_github(
@@ -115,14 +122,18 @@ def update_or_create_file_in_posts_github(
     repo = get_configure_repo_object(github_object)
 
     _, posts, drafts = get_folders_and_repo()
+    filename = filename.strip()
     if folder == "posts":
         file_path = f"{posts}/{filename}"
+        folder_contents = get_repo_contents(repo, posts)
     elif folder == "drafts":
         file_path = f"{drafts}/{filename}"
+        folder_contents = get_repo_contents(repo, drafts)
     else:
         file_path = ""
-    posts_contents = repo.get_contents(posts)
-    posts_files_name = {post.path: post.path for post in posts_contents}
+        folder_contents = {}
+
+    posts_files_name = {post.path: post.path for post in folder_contents}
 
     if file_path in posts_files_name:
         file_content = repo.get_contents(file_path)
